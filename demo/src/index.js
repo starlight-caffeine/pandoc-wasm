@@ -1062,10 +1062,10 @@ window.pandocApp = function() {
 
           const pdfBlob = new Blob([pdfData], { type: 'application/pdf' });
           this.output = pdfBlob;
-          this.displayResults(typstResult, options, files);
+          this.displayResults(typstResult, options, result.files);
         } else {
           const result = await window.pandocModule.convert(options, stdin, files);
-          this.displayResults(result, options, files);
+          this.displayResults(result, options, result.files);
         }
       } catch (err) {
         this.showOutput = true;
