@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## pandoc-wasm (development version)
 
+* Upgraded to pandoc 3.10 (#8).
+
+## pandoc-wasm (1.0.1)
+
 ### Organisation
 
 This repository has been migrated to the pandoc-wasm package at https://github.com/pandoc/pandoc-wasm.
