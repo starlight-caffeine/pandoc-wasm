@@ -6,6 +6,7 @@
 
 import {
     ConsoleStdout,
+    Directory,
     File,
     OpenFile,
     PreopenDirectory,
@@ -167,14 +168,13 @@ export function createPandocInstance(wasmBinary) {
                 knownFiles.add(outputFileName)
             }
 
-            // Add media file placeholder for extracted media
-            if (extractMediaPath) {
+            // Add placeholder file for extract-media zip archives. For
+            // directory targets nothing is pre-created: pandoc creates the
+            // directory itself, and a file placeholder at that path would
+            // make it fail with ENOTDIR.
+            if (extractMediaPath && extractMediaPath.endsWith(".zip")) {
                 await addFile(extractMediaPath, new Blob(), false)
-                // Only add to knownFiles if it's a zip file (not a directory)
-                // Directory contents are the actual media files we want in mediaFiles
-                if (extractMediaPath.endsWith(".zip")) {
-                    knownFiles.add(extractMediaPath)
-                }
+                knownFiles.add(extractMediaPath)
             }
 
             // Set stdin content
@@ -210,24 +210,30 @@ export function createPandocInstance(wasmBinary) {
                 }
             }
 
-            // Collect any newly created media files (e.g., extracted images)
-            // mediaFiles should ONLY contain extracted media, NOT the output file
+            // Collect any newly created files (e.g., extracted media images).
+            // Media extracted to a directory is nested (e.g. docx media lands
+            // at "<extract-media>/media/image1.png"), so walk directories
+            // recursively. mediaFiles should ONLY contain extracted media,
+            // NOT the output file or extract-media zip archive (both are
+            // tracked in knownFiles).
             const mediaFiles = {}
-            for (const [name, fileData] of fileSystem.entries()) {
-                if (
-                    !knownFiles.has(name) &&
-                    fileData &&
-                    fileData.data &&
-                    fileData.data.length > 0
-                ) {
-                    const blob = new Blob([fileData.data])
-                    files[name] = blob
-                    // Only add to mediaFiles if it's not the output file or extract-media archive
-                    if (name !== outputFileName && name !== extractMediaPath) {
-                        mediaFiles[name] = blob
+            const collectNewFiles = (map, prefix) => {
+                for (const [name, entry] of map.entries()) {
+                    const path = prefix ? `${prefix}/${name}` : name
+                    if (entry instanceof Directory) {
+                        collectNewFiles(entry.contents, path)
+                    } else if (
+                        !knownFiles.has(path) &&
+                        entry.data &&
+                        entry.data.length > 0
+                    ) {
+                        const blob = new Blob([entry.data])
+                        files[path] = blob
+                        mediaFiles[path] = blob
                     }
                 }
             }
+            collectNewFiles(fileSystem, "")
 
             // Parse warnings
             const rawWarnings = new TextDecoder("utf-8", {fatal: true}).decode(
