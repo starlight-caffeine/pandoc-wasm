@@ -27,7 +27,7 @@ jobs:
           node-version: "20"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Download Pandoc WASM
         run: npm run prepare
@@ -63,7 +63,7 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Download Pandoc WASM
         run: npm run prepare
