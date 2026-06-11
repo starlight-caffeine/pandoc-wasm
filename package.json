@@ -27,7 +27,7 @@
   "scripts": {
     "prepare": "node scripts/download-wasm.js",
     "setup-demo": "node scripts/setup-demo.js && esbuild demo/src/index.js --bundle --minify --format=esm --outfile=demo/dist/index.js && cp demo/src/index.html demo/dist/index.html",
-    "test": "node test-simple.js"
+    "test": "node test-simple.js && node test-media-extraction.js && node test-non-ascii-filenames.js"
   },
   "repository": {
     "type": "git",
