@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 * Upgraded to pandoc 3.10 (#8).
 
+### Bug fixes
+
+* Fix media extraction to directory targets (#7).
+
 ## pandoc-wasm (1.0.1)
 
 ### Organisation
