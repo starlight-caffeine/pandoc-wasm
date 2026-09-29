@@ -7,7 +7,7 @@
 import {createPandocInstance} from "./core.js"
 
 // Load WASM file for browser
-const pandocWasmModule = await import("./pandoc.wasm")
+const pandocWasmModule = await import("./pandoc.wasm?url")
 const pandocWasmLocation = pandocWasmModule.default
 const pandocWasmFetch = await fetch(pandocWasmLocation)
 const pandocWasm = await pandocWasmFetch.arrayBuffer()
